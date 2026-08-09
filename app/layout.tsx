@@ -3,8 +3,9 @@ import { Roboto, Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import Nav from "@/components/ui/nav/nav";
+import Providers from "./providers";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const roboto = Roboto({
   subsets: ["latin"],
@@ -25,12 +26,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", roboto.className, roboto.className, "font-sans", geist.variable)}
-      
+      className={cn(
+        "h-full",
+        "antialiased",
+        roboto.className,
+        roboto.className,
+        "font-sans",
+        geist.variable,
+      )}
     >
       <body className="min-h-full flex flex-col">
-        <Nav />
-        {children}
+        <Providers>
+          <Nav />
+          {children}
+        </Providers>
       </body>
     </html>
   );

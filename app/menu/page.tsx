@@ -1,6 +1,8 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Prisma } from "@/lib/generated/prisma/client";
 import Image from "next/image";
+import { formatCurrency } from "@/lib/FormatCurrency";
+import  CategoryButton  from "@/components/ui/CategroyButton";
 
 type ProductWithCategory = Prisma.ProductGetPayload<{
   include: {
@@ -35,31 +37,7 @@ async function MenuPage() {
             className="w-full rounded-xl border border-slate-200 bg-white px-5 py-3 outline-none transition focus:border-orange-500 md:max-w-md"
           />
 
-          <div className="flex flex-wrap gap-3">
-            <button className="rounded-full bg-orange-600 px-5 py-2 text-white">
-              All
-            </button>
-
-            <button className="rounded-full border px-5 py-2 transition hover:bg-orange-600 hover:text-white">
-              Pizza
-            </button>
-
-            <button className="rounded-full border px-5 py-2 transition hover:bg-orange-600 hover:text-white">
-              Burger
-            </button>
-
-            <button className="rounded-full border px-5 py-2 transition hover:bg-orange-600 hover:text-white">
-              Pasta
-            </button>
-
-            <button className="rounded-full border px-5 py-2 transition hover:bg-orange-600 hover:text-white">
-              Salads
-            </button>
-
-            <button className="rounded-full border px-5 py-2 transition hover:bg-orange-600 hover:text-white">
-              Desserts
-            </button>
-          </div>
+          <CategoryButton />
         </div>
 
         {/* Products */}
@@ -81,7 +59,7 @@ async function MenuPage() {
                 <div className="mt-6 flex items-center justify-between">
                   <h3 className="text-xl font-bold">{item.name}</h3>
 
-                  <span className="font-bold text-orange-600">{item.basePrice}</span>
+                  <span className="font-bold text-orange-600">{formatCurrency(item.basePrice)}</span>
                 </div>
 
                 <p className="mt-3 text-sm leading-7 text-slate-500">

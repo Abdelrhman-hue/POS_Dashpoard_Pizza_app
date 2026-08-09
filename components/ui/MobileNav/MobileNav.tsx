@@ -23,7 +23,7 @@ export default function MobileMenu() {
           </Button>
         }
       />
-      <SheetContent side="left">
+      <SheetContent side="right">
         {links.map((link) => (
           <Link key={link.id} href={link.href} className={mobileLinkClass}>
             {link.name}

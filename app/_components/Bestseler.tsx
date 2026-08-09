@@ -12,7 +12,7 @@ type ProductWithCategory = Prisma.ProductGetPayload<{
 }>;
 
 async function Bestsellers() {
-  const data = await fetch("http://localhost:3000/api/products/Best", {
+  const data = await fetch("http://localhost:3000/api/products/Bast", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
