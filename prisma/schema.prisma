@@ -17,6 +17,7 @@ model User {
   password      String?
   name          String
   image         String?
+  emailVerified DateTime?
   phone         String?
   streetAddress String?
   postalCode    String?
@@ -35,7 +36,7 @@ model Account {
   userId            String  @map("user_id")
   type              String
   provider          String
-  providerAccountId String @map("provider_account_id")
+  providerAccountId String  @map("provider_account_id")
   refresh_token     String? @db.Text
   access_token      String? @db.Text
   expires_at        Int?

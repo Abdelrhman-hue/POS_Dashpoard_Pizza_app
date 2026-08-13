@@ -40,7 +40,7 @@ async function Bestsellers() {
                   alt={item.name}
                   width={180}
                   height={180}
-                  className="h-44 w-44 object-contain transition duration-500 group-hover:scale-110 group-hover:rotate-3"
+                  className="h-44 w-44 object-cover rounded-4xl transition duration-500 group-hover:scale-110 group-hover:rotate-3"
                 />
               </div>
 

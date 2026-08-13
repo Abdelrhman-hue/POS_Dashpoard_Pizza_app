@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
-import { FaGoogle, FaApple, FaAddressBook } from "react-icons/fa";
+import { FaAddressBook } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { useState } from "react";
 import { registerSchema } from "@/utils/AuthSchema";
 import Alert from "@/components/ui/Alert";
 import { registerAction } from "@/actions/auth-actions";
+import ProvidersButton from "@/components/ui/ProvidersButton";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -204,20 +205,7 @@ export default function RegisterForm() {
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border duration-300 hover:border-orange-500 hover:bg-orange-50 mb-2"
-      >
-        <FaGoogle size={20} />
-        Continue with Google
-      </motion.button>
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border duration-300 hover:border-orange-500 hover:bg-orange-50"
-      >
-        <FaApple size={20} />
-        Continue with Apple
-      </motion.button>
+      <ProvidersButton />
 
       <p className="mt-8 text-center text-gray-500">
         Already have an account?

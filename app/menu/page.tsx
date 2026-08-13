@@ -52,7 +52,7 @@ async function MenuPage() {
                     alt={item.name}
                     width={176}
                     height={176}
-                    className="h-44 w-44 rounded-full bg-orange-100"
+                    className="h-44 w-44 rounded-3xl object-cover transition duration-500 group-hover:scale-110 group-hover:rotate-3 bg-orange-100"
                   />
                 </div>
 

@@ -8,6 +8,7 @@ import { loginSchema } from "@/utils/AuthSchema";
 import Alert from "@/components/ui/Alert";
 import { AnimatePresence } from "framer-motion";
 import { loginAction } from "@/actions/auth-actions";
+import ProvidersButton from "@/components/ui/ProvidersButton";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -187,14 +188,7 @@ export default function LoginPage() {
               <div className="h-px flex-1 bg-gray-200" />
             </div>
 
-            <button className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border bg-white transition-all duration-300 hover:border-orange-500 hover:bg-orange-50 mb-2">
-              <FaGoogle size={20} />
-              Continue with Google
-            </button>
-            <button className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border bg-white transition-all duration-300 hover:border-orange-500 hover:bg-orange-50">
-              <FaApple size={20} />
-              Continue with Apple
-            </button>
+            <ProvidersButton />
 
             <p className="mt-8 text-center text-gray-500">
               Don&apos;t have an account?
