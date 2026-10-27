@@ -136,6 +136,7 @@ export default async function OrderPage(props: {
                         src={item.product.image}
                         alt={item.product.name}
                         fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     </div>

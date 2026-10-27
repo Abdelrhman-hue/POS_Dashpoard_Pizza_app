@@ -69,6 +69,7 @@ export default function AboutPage() {
                 src={pizza}
                 alt="Fresh Pizza"
                 fill
+                sizes="(max-width: 768px) 100vw, 384px"
                 className="object-contain animate-float drop-shadow-2xl"
                 priority
               />

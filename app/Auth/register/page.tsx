@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+
 import RegisterForm from "@/components/ui/register/RegisterForm";
 import RegisterHero from "@/components/ui/register/RegisterHero";
 
 export default function RegisterPage() {
-  console.log("api",process.env.RESEND_API_KEY)
+
   return (
     <main className="relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-gradient-to-br from-orange-50 via-white to-orange-100">
 

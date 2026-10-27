@@ -2,7 +2,7 @@ import { prisma } from "@/utils/prisma";
 import { NextResponse } from "next/server";
 
 
-export async function GET(request: Request) {
+export async function GET() {
     const bestsellers = await prisma.product.findMany({
         where:{order:{gt: 14}},
         include:{category:true}

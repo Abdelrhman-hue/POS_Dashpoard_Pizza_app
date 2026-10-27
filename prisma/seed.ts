@@ -23,7 +23,7 @@ export const categories = [
 ];
 
 
-const products = [
+const _products = [
   {
     name: "Margherita Pizza",
     description:

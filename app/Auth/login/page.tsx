@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Mail, Lock, Pizza, ArrowRight } from "lucide-react";
-import { FaGoogle, FaApple } from "react-icons/fa";
+
 import { useState, useEffect } from "react";
 import { loginSchema } from "@/utils/AuthSchema";
 import Alert from "@/components/ui/Alert";
