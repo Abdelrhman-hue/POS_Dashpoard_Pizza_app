@@ -159,12 +159,21 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+              <p className="mt-1.5 text-start text-gray-500">
+                if forgot your password
+                <Link
+                  href="/forget-password"
+                  className="ml-2 font-semibold text-orange-600 hover:underline"
+                >
+                  Resat your Password
+                </Link>
+              </p>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-orange-600 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-orange-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
+                className="flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-orange-600 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:bg-orange-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loading ? (
                   <>

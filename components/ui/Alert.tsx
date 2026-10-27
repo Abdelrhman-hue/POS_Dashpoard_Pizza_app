@@ -3,15 +3,15 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertCircle, CheckCircle2, X } from "lucide-react";
 
-type AlertProps = {
-  open: boolean;
+export type AlertProps = {
+  open?: boolean;
   message: string;
   type?: "success" | "error";
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 export default function Alert({
-  open,
+  open = true,
   message,
   type = "error",
   onClose,
@@ -57,13 +57,15 @@ export default function Alert({
 
             <p className="flex-1 font-medium text-gray-700">{message}</p>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-full p-1 transition hover:bg-black/10"
-            >
-              <X size={18} />
-            </button>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full p-1 transition hover:bg-black/10 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            )}
           </div>
         </motion.div>
       )}

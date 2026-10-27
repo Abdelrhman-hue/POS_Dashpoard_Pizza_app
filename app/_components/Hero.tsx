@@ -4,12 +4,13 @@ import Link from "@/components/ui/link/link";
 import { Button } from "@/components/ui/button";
 import pizza from "@/public/pizza.png";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
+
 function Hero() {
   return (
     <section className="flex min-h-[calc(100vh-80px)] items-center animate-fade-up">
-      <div className="container grid items-center gap-16 py-12 md:grid-cols-2">
+      <div className="container mx-auto px-4 grid items-center gap-16 py-12 md:grid-cols-2">
         {/* Left */}
-        <div className=" space-y-8">
+        <div className="space-y-8">
           <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-medium text-orange-600">
             🍕 Fresh & Hot Pizza
           </span>
@@ -24,10 +25,10 @@ function Hero() {
             away!
           </p>
 
-          <Link href="/order">
+          <Link href="/menu">
             <Button
               size="lg"
-              className="group rounded-xl px-8 py-7 text-base transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="group rounded-xl px-8 py-7 text-base transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
             >
               Order Now
               <FaRegArrowAltCircleRight className="ml-2 transition-transform duration-300 group-hover:translate-x-2" />

@@ -10,8 +10,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider !=="credentials") {
-        return true
+      if (account?.provider !== "credentials") {
+        return true;
       }
       const userdb = await prisma.user.findUnique({ where: { id: user.id } });
       if (!userdb?.emailVerified) {
@@ -24,16 +24,51 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.tokenVersion = user.tokenVersion;
+      }
+
+      const dbUser = await prisma.user.findUnique({
+        where: {
+          id: token.id as string,
+        },
+        select: {
+          tokenVersion: true,
+          role: true,
+        },
+      });
+
+      if (!dbUser) {
+        token.invalid = true;
+        return token;
+      }
+
+      token.role = dbUser.role as UserRole;
+
+      if (dbUser.tokenVersion !== token.tokenVersion) {
+        token.invalid = true;
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+      const dbUser = await prisma.user.findUnique({
+        where: {
+          id: token.id as string,
+        },
+      });
+
+      if (!dbUser || dbUser.tokenVersion !== token.tokenVersion) {
+        session.user = undefined as never;
+        return session;
       }
+
+      session.user.id = dbUser.id;
+      session.user.name = dbUser.name;
+      session.user.email = dbUser.email;
+      session.user.image = dbUser.image;
+      session.user.role = dbUser.role as UserRole;
+      session.user.tokenVersion = dbUser.tokenVersion;
 
       return session;
     },
@@ -47,5 +82,3 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
-
-// throw new Error("Function not implemented.");

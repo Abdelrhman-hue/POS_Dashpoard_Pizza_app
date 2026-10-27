@@ -2,24 +2,22 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import {
-  User,
   Mail,
   Phone,
   MapPin,
   Package,
-  Heart,
-  Settings,
   LogOut,
   Edit3,
-  Camera,
   ChevronRight,
   ShoppingBag,
 } from "lucide-react";
 import { logout } from "@/actions/auth-actions";
 import { useState } from "react";
+import { formatCurrency } from "@/lib/FormatCurrency";
 
-type UserData = {
+export type UserData = {
   id: string;
   name: string;
   email: string;
@@ -31,39 +29,27 @@ type UserData = {
   country: string | null;
 };
 
-type Order = {
+export type RealOrderData = {
   id: string;
-  date: string;
-  status: "Delivered" | "Processing";
-  total: string;
-  items: number;
+  createdAt: Date | string;
+  totalPrice: number;
+  paid: boolean;
+  products: {
+    id: string;
+    quantity: number;
+    product: {
+      name: string;
+    };
+  }[];
 };
 
-const orders: Order[] = [
-  {
-    id: "#ORD-1001",
-    date: "Aug 5, 2026",
-    status: "Delivered",
-    total: "$42.99",
-    items: 3,
-  },
-  {
-    id: "#ORD-1002",
-    date: "Aug 2, 2026",
-    status: "Processing",
-    total: "$28.50",
-    items: 2,
-  },
-  {
-    id: "#ORD-1003",
-    date: "Jul 28, 2026",
-    status: "Delivered",
-    total: "$65.20",
-    items: 5,
-  },
-];
-
-export default function ProfileClient({ user }: { user: UserData }) {
+export default function ProfileClient({
+  user,
+  orders = [],
+}: {
+  user: UserData;
+  orders?: RealOrderData[];
+}) {
   const [loading, setLoading] = useState(false);
   const address = [user.streetAddress, user.city, user.country]
     .filter(Boolean)
@@ -71,434 +57,232 @@ export default function ProfileClient({ user }: { user: UserData }) {
 
   async function handleLogout(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     setLoading(true);
-
-    try {
-      await logout();
-      window.location.href = "/Auth/login";
-    } catch (error) {
-      console.error("Logout failed:", error);
-      setLoading(false);
-    }
+    await logout();
   }
 
-  const fullAddress = [
-    user.streetAddress,
-    user.city,
-    user.postalCode,
-    user.country,
-  ]
+  const initials = user.name
+    .split(" ")
     .filter(Boolean)
-    .join(", ");
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100 px-3 py-6 sm:px-5 sm:py-8 md:px-8 md:py-10">
-      <div className="mx-auto w-full max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50/40 via-white to-orange-50/20 py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-6 sm:mb-8"
+          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h1 className="text-2xl font-black text-gray-900 sm:text-3xl">
             My Profile
           </h1>
-
-          <p className="mt-2 text-sm text-gray-500 sm:text-base">
-            Manage your account and check your orders.
+          <p className="mt-1 text-sm text-gray-500 sm:text-base">
+            Manage your account settings and check your order history.
           </p>
         </motion.div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 gap-5 md:gap-8 lg:grid-cols-3">
-          {/* ================= PROFILE CARD ================= */}
-          <motion.section
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="rounded-3xl bg-white p-5 shadow-xl sm:p-6 lg:col-span-1"
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* User Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex flex-col justify-between rounded-3xl border border-gray-100 bg-white p-6 shadow-sm"
           >
-            {/* Avatar */}
-            <div className="flex flex-col items-center">
-              <div className="group relative">
-                <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-4xl font-bold text-white shadow-lg sm:h-32 sm:w-32 sm:text-5xl">
-                  {user.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user.name}
-                      width={128}
-                      height={128}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    user.name.charAt(0).toUpperCase()
-                  )}
+            <div>
+              {/* Avatar + Name */}
+              <div className="flex flex-col items-center text-center">
+                <div className="relative">
+                  <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-orange-400 to-orange-600 text-3xl font-bold text-white shadow-xl shadow-orange-500/20 ring-4 ring-orange-50">
+                    {user.image ? (
+                      <Image
+                        src={user.image}
+                        alt={user.name}
+                        width={112}
+                        height={112}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initials
+                    )}
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white bg-orange-600 text-white transition hover:scale-110 hover:bg-orange-700 sm:h-10 sm:w-10"
-                >
-                  <Camera size={17} />
-                </button>
+                <h2 className="mt-4 text-xl font-bold text-gray-900">
+                  {user.name}
+                </h2>
+                <p className="text-sm text-gray-500">{user.email}</p>
               </div>
 
-              <h2 className="mt-4 max-w-full truncate text-center text-xl font-bold text-gray-900 sm:mt-5 sm:text-2xl">
-                {user.name}
-              </h2>
+              {/* Info List */}
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center gap-3 rounded-2xl bg-gray-50 p-3.5 text-sm text-gray-700">
+                  <Mail size={18} className="text-orange-600 shrink-0" />
+                  <span className="truncate">{user.email}</span>
+                </div>
 
-              <p className="mt-1 text-sm text-gray-500">Customer</p>
+                <div className="flex items-center gap-3 rounded-2xl bg-gray-50 p-3.5 text-sm text-gray-700">
+                  <Phone size={18} className="text-orange-600 shrink-0" />
+                  <span>{user.phone || "No phone added"}</span>
+                </div>
 
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 py-3 text-sm font-semibold text-orange-600 transition hover:bg-orange-100 sm:mt-6 sm:text-base"
-              >
-                <Edit3 size={18} />
-                Edit Profile
-              </motion.button>
+                <div className="flex items-start gap-3 rounded-2xl bg-gray-50 p-3.5 text-sm text-gray-700">
+                  <MapPin size={18} className="text-orange-600 shrink-0 mt-0.5" />
+                  <span>{address || "No address added yet"}</span>
+                </div>
+              </div>
             </div>
 
-            {/* User Information */}
-            <div className="mt-7 space-y-5 sm:mt-8">
-              {/* Email */}
-              <InfoItem
-                icon={<Mail size={20} />}
-                label="Email"
-                value={user.email}
-              />
-
-              {/* Phone */}
-              <InfoItem
-                icon={<Phone size={20} />}
-                label="Phone"
-                value={user.phone || "Not provided"}
-              />
-
-              {/* Address */}
-              <InfoItem
-                icon={<MapPin size={20} />}
-                label="Address"
-                value={fullAddress || "Not provided"}
-              />
-            </div>
-
-            {/* Logout */}
-            <form onSubmit={handleLogout}>
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-8 flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 py-3 font-semibold text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+            {/* Actions */}
+            <div className="mt-8 space-y-3 pt-6 border-t border-gray-100">
+              <Link
+                href="/profile/edit-profile"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-orange-600 py-3 text-sm font-bold text-white shadow-md shadow-orange-600/20 transition hover:bg-orange-700"
               >
-                {loading ? (
-                  <>
-                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-red-200 border-t-red-500" />
-                    Logging out...
-                  </>
-                ) : (
-                  <>
-                    Logout
-                    <LogOut size={18} />
-                  </>
-                )}
-              </button>
-            </form>
-          </motion.section>
+                <Edit3 size={16} />
+                <span>Edit Profile</span>
+              </Link>
 
-          {/* ================= RIGHT SIDE ================= */}
-          <div className="space-y-5 md:space-y-8 lg:col-span-2">
-            {/* Statistics */}
+              <form onSubmit={handleLogout}>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-gray-200 py-3 text-sm font-semibold text-gray-600 transition hover:bg-red-50 hover:text-red-600 hover:border-red-200 cursor-pointer"
+                >
+                  <LogOut size={16} />
+                  <span>{loading ? "Signing out..." : "Sign Out"}</span>
+                </button>
+              </form>
+            </div>
+          </motion.div>
+
+          {/* Orders Section (2 cols) */}
+          <div className="lg:col-span-2 space-y-6">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.15,
-              }}
-              className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4"
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="rounded-3xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm"
             >
-              <StatCard
-                icon={<ShoppingBag size={22} />}
-                title="Orders"
-                value="12"
-              />
-
-              <StatCard
-                icon={<Package size={22} />}
-                title="Delivered"
-                value="10"
-              />
-
-              <StatCard
-                icon={<Heart size={22} />}
-                title="Favorites"
-                value="8"
-              />
-
-              <StatCard
-                icon={<Settings size={22} />}
-                title="Points"
-                value="240"
-              />
-            </motion.div>
-
-            {/* Recent Orders */}
-            <motion.section
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.25,
-              }}
-              className="rounded-3xl bg-white p-4 shadow-xl sm:p-6"
-            >
-              {/* Header */}
-              <div className="mb-5 flex items-center justify-between sm:mb-6">
+              <div className="mb-6 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
-                    Recent Orders
+                  <h2 className="text-xl font-black text-gray-900">
+                    Order History
                   </h2>
-
-                  <p className="mt-1 text-xs text-gray-500 sm:text-sm">
-                    Your latest orders
+                  <p className="text-sm text-gray-500">
+                    All your past and active orders
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  className="hidden items-center gap-1 text-sm font-semibold text-orange-600 transition hover:text-orange-700 sm:flex"
+                <Link
+                  href="/menu"
+                  className="flex items-center gap-1.5 text-sm font-bold text-orange-600 transition hover:text-orange-700"
                 >
-                  View All
-                  <ChevronRight size={18} />
-                </button>
+                  <ShoppingBag size={16} />
+                  <span>Order Again</span>
+                </Link>
               </div>
 
-              {/* Orders */}
-              <div className="space-y-4">
-                {orders.map((order, index) => (
-                  <motion.div
-                    key={order.id}
-                    initial={{
-                      opacity: 0,
-                      x: 30,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    transition={{
-                      duration: 0.4,
-                      delay: 0.35 + index * 0.1,
-                    }}
-                    whileHover={{
-                      scale: 1.01,
-                    }}
-                    className="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50 p-4 transition hover:border-orange-200 hover:bg-orange-50/40 sm:flex-row sm:items-center sm:justify-between"
+              {orders.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 py-12 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-50 text-2xl">
+                    📦
+                  </div>
+                  <h3 className="mt-4 text-base font-bold text-gray-800">
+                    No orders placed yet
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Craving delicious pizza? Make your first order today!
+                  </p>
+                  <Link
+                    href="/menu"
+                    className="mt-5 inline-flex items-center gap-2 rounded-full bg-orange-600 px-6 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-orange-700"
                   >
-                    {/* Order Info */}
-                    <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 sm:h-12 sm:w-12">
-                        <Package size={22} />
-                      </div>
+                    <span>Browse Menu</span>
+                    <ChevronRight size={16} />
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {orders.map((order, index) => {
+                    const formattedDate = new Intl.DateTimeFormat("en-US", {
+                      dateStyle: "medium",
+                    }).format(new Date(order.createdAt));
 
-                      <div className="min-w-0">
-                        <h3 className="truncate text-sm font-bold text-gray-900 sm:text-base">
-                          {order.id}
-                        </h3>
+                    const totalItems = order.products.reduce(
+                      (sum, p) => sum + p.quantity,
+                      0
+                    );
 
-                        <p className="text-xs text-gray-500 sm:text-sm">
-                          {order.date} • {order.items} items
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Order Details */}
-                    <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end sm:gap-6">
-                      {/* Total */}
-                      <div>
-                        <p className="text-xs text-gray-400 sm:text-sm">
-                          Total
-                        </p>
-
-                        <p className="text-sm font-bold text-gray-900 sm:text-base">
-                          {order.total}
-                        </p>
-                      </div>
-
-                      {/* Status */}
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-[10px] font-semibold sm:px-3 sm:text-xs ${
-                          order.status === "Delivered"
-                            ? "bg-green-100 text-green-600"
-                            : "bg-yellow-100 text-yellow-600"
-                        }`}
+                    return (
+                      <motion.div
+                        key={order.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 + index * 0.05 }}
+                        className="group flex flex-col gap-4 rounded-2xl border border-gray-100 bg-gray-50/70 p-4 transition hover:border-orange-200 hover:bg-orange-50/30 sm:flex-row sm:items-center sm:justify-between"
                       >
-                        {order.status}
-                      </span>
+                        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
+                            <Package size={22} />
+                          </div>
 
-                      {/* Arrow */}
-                      <button
-                        type="button"
-                        className="hidden rounded-full p-2 text-gray-400 transition hover:bg-white hover:text-orange-600 sm:block"
-                      >
-                        <ChevronRight size={20} />
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                          <div className="min-w-0">
+                            <h3 className="font-mono text-sm font-bold text-gray-900 truncate">
+                              #{order.id.slice(0, 8)}
+                            </h3>
+                            <p className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
+                              <span>{formattedDate}</span>
+                              <span>•</span>
+                              <span>
+                                {totalItems} item{totalItems > 1 ? "s" : ""}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
 
-              {/* Mobile View All */}
-              <button
-                type="button"
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-orange-200 py-3 text-sm font-semibold text-orange-600 transition hover:bg-orange-50 sm:hidden"
-              >
-                View All Orders
-                <ChevronRight size={18} />
-              </button>
-            </motion.section>
+                        <div className="flex items-center justify-between sm:justify-end gap-4">
+                          <div>
+                            <p className="text-[11px] text-gray-400">Total</p>
+                            <p className="text-sm font-black text-gray-900">
+                              {formatCurrency(order.totalPrice)}
+                            </p>
+                          </div>
 
-            {/* Quick Actions */}
-            <motion.section
-              initial={{
-                opacity: 0,
-                y: 40,
-              }}
-              animate={{
-                opacity: 1,
-                y: 0,
-              }}
-              transition={{
-                duration: 0.6,
-                delay: 0.35,
-              }}
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4"
-            >
-              <ActionCard
-                icon={<Heart size={22} />}
-                title="Favorites"
-                description="View your favorite meals"
-              />
+                          <span
+                            className={`rounded-full px-3 py-1 text-xs font-bold ${
+                              order.paid
+                                ? "bg-green-100 text-green-700"
+                                : "bg-amber-100 text-amber-700"
+                            }`}
+                          >
+                            {order.paid ? "Paid" : "Cash On Delivery"}
+                          </span>
 
-              <ActionCard
-                icon={<Settings size={22} />}
-                title="Account Settings"
-                description="Manage your account settings"
-              />
-            </motion.section>
+                          <Link
+                            href={`/orders/${order.id}`}
+                            className="rounded-xl border border-gray-200 bg-white p-2 text-gray-500 transition hover:border-orange-500 hover:text-orange-600"
+                            title="View details"
+                          >
+                            <ChevronRight size={18} />
+                          </Link>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.div>
           </div>
         </div>
       </div>
-    </main>
-  );
-}
-
-/* ================================= */
-/* Info Item */
-/* ================================= */
-
-function InfoItem({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 sm:h-11 sm:w-11">
-        {icon}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <p className="text-xs text-gray-400">{label}</p>
-
-        <p className="truncate text-sm font-medium text-gray-700 sm:text-base">
-          {value}
-        </p>
-      </div>
     </div>
-  );
-}
-
-/* ================================= */
-/* Statistics Card */
-/* ================================= */
-
-function StatCard({
-  icon,
-  title,
-  value,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  value: string;
-}) {
-  return (
-    <motion.div
-      whileHover={{
-        y: -5,
-      }}
-      className="rounded-2xl bg-white p-4 shadow-lg transition-shadow hover:shadow-xl sm:p-5"
-    >
-      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 text-orange-600 sm:h-10 sm:w-10">
-        {icon}
-      </div>
-
-      <p className="mt-3 text-xs text-gray-500 sm:mt-4 sm:text-sm">{title}</p>
-
-      <p className="mt-1 text-xl font-bold text-gray-900 sm:text-2xl">
-        {value}
-      </p>
-    </motion.div>
-  );
-}
-
-/* ================================= */
-/* Action Card */
-/* ================================= */
-
-function ActionCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <motion.button
-      type="button"
-      whileHover={{
-        y: -5,
-      }}
-      whileTap={{
-        scale: 0.98,
-      }}
-      className="flex min-w-0 items-center gap-3 rounded-2xl bg-white p-4 text-left shadow-lg transition hover:shadow-xl sm:gap-4 sm:p-5"
-    >
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600 sm:h-12 sm:w-12">
-        {icon}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <h3 className="truncate font-bold text-gray-900">{title}</h3>
-
-        <p className="mt-1 truncate text-xs text-gray-500 sm:text-sm">
-          {description}
-        </p>
-      </div>
-
-      <ChevronRight
-        size={18}
-        className="shrink-0 text-gray-400 sm:h-5 sm:w-5"
-      />
-    </motion.button>
   );
 }

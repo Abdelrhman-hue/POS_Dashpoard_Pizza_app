@@ -1,8 +1,9 @@
-
 import { auth } from "@/auth";
 import { prisma } from "@/utils/prisma";
 import { redirect } from "next/navigation";
 import ProfileContent from "@/components/ui/ProfileContent";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -32,5 +33,28 @@ export default async function ProfilePage() {
     redirect("/Auth/login");
   }
 
-  return <ProfileContent user={user} />;
+  const orders = await prisma.order.findMany({
+    where: {
+      OR: [
+        { userEmail: user.email },
+        { products: { some: { userId: user.id } } },
+      ],
+    },
+    include: {
+      products: {
+        include: {
+          product: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return <ProfileContent user={user} orders={orders} />;
 }
