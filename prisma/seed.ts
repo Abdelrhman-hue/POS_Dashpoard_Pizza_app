@@ -23,6 +23,7 @@ export const categories = [
 ];
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _products = [
   {
     name: "Margherita Pizza",

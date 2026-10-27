@@ -167,6 +167,7 @@ export default function AddToCartModal({
                   src={product.image}
                   alt={product.name}
                   fill
+                  sizes="208px"
                   className="object-cover"
                   priority
                 />

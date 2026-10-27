@@ -234,6 +234,7 @@ export default function ProductsManager({
                     src={p.image}
                     alt={p.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="object-cover"
                   />
                   <span className="absolute left-3 top-3 rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-bold text-slate-700 shadow-sm">
@@ -389,6 +390,7 @@ export default function ProductsManager({
                       src={formData.image}
                       alt="Preview"
                       fill
+                      sizes="(max-width: 768px) 100vw, 400px"
                       className="object-cover"
                     />
                   </div>
